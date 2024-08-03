@@ -83,6 +83,27 @@ const audiencias = [
 
 
 // Rotas Processos
+
+/**
+ * @swagger
+ * /processos:
+ *   post:
+ *     summary: Cria um novo processo
+ *     tags: [Processos]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Processo'
+ *     responses:
+ *       201:
+ *         description: O processo foi criado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Processo'
+ */
 app.post('/processos', (req, res) => {
     const { numero, descricao, data_abertura, status, cliente_id, advogado_id } = req.body;
     const id = uuidv4();
@@ -91,16 +112,87 @@ app.post('/processos', (req, res) => {
     res.status(201).json(novoProcesso);
 });
 
+
+/**
+ * @swagger
+ * /processos:
+ *   get:
+ *     summary: Retorna todos os processos
+ *     tags: [Processos]
+ *     responses:
+ *       200:
+ *         description: A lista de processos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Processo'
+ */
 app.get('/processos', (req, res) => {
     res.json(processos);
 });
 
+
+/**
+ * @swagger
+ * /processos/{id}:
+ *   get:
+ *     summary: Retorna um processo específico pelo ID
+ *     tags: [Processos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do processo
+ *     responses:
+ *       200:
+ *         description: O processo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Processo'
+ *       404:
+ *         description: Processo não encontrado
+ */
 app.get('/processos/:id', (req, res) => {
     const processo = processos.find(p => p.id === req.params.id);
     if (!processo) return res.status(404).json({ message: 'Processo não encontrado' });
     res.json(processo);
 });
 
+
+/**
+ * @swagger
+ * /processos/{id}:
+ *   put:
+ *     summary: Atualiza um processo específico pelo ID
+ *     tags: [Processos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do processo
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Processo'
+ *     responses:
+ *       200:
+ *         description: O processo foi atualizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Processo'
+ *       404:
+ *         description: Processo não encontrado
+ */
 app.put('/processos/:id', (req, res) => {
     const index = processos.findIndex(p => p.id === req.params.id);
     if (index === -1) return res.status(404).json({ message: 'Processo não encontrado' });
@@ -115,7 +207,7 @@ app.patch('/processos/:id', (req, res) => {
     const { status, descricao } = req.body;
     if (status !== undefined) {
         processos[index].status = status;
-    }
+    }   
     if (descricao !== undefined) {
         processos[index].descricao = descricao;
     }
