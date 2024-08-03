@@ -1,85 +1,84 @@
+// src/index.js
 const express = require('express');
 const bodyParser = require('body-parser');
 const { v4: uuidv4 } = require('uuid');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const setupSwagger = require('./swagger');
+const verifyToken = require('./middleware/auth');
+const cors = require('cors');
 
 const app = express();
 const port = 3000;
 
 // Middleware
+app.use(express.json());
+app.use(cors());
+// Configurar Swagger
+setupSwagger(app);
+
+// Chave secreta para JWT
+const secretKey = 'secreta'; // Substitua por uma chave secreta segura e configure isso em um arquivo de ambiente
+
+// Mock de dados e usuários
+const processos = [];
+const advogados = [];
+const clientes = [];
+const audiencias = [];
+const users = [
+    {
+        id: '1',
+        username: 'user',
+        password: '$2a$10$D9UIsmR29q7pDk/UhPzPmeXtt7l1vO9n.kpd2jJ7Z/Ji3SE5bBO5K' // 'password' criptografada
+    }
+];
+
+// Endpoint de Login
+/**
+ * @openapi
+ * /login:
+ *   post:
+ *     summary: Autentica o usuário e retorna um token JWT
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Token JWT gerado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ */
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    const user = users.find(u => u.username === username);
+    console.log(user)
+   if (!user) return res.status(401).json({ message: 'Credenciais inválidas' });
+
+    bcrypt.compare(password, user.password, (err, result) => {
+        if (err || !result) { 
+            console.log(err);
+            console.log(result);
+            return res.status(401).json({ message: 'Credenciais inválidas!' });
+        }
+        const token = jwt.sign({ id: user.id, username: user.username }, secretKey, { expiresIn: '1h' });
+        res.json({ token });
+    });
+});
+// Middleware
 app.use(bodyParser.json());
-
-// Dados em memória para simplificação
-const processos = [
-    {
-        id: '1',
-        numero: '12345',
-        descricao: 'Ação de indenização por danos morais.',
-        data_abertura: '2024-01-15',
-        status: 'Aberto',
-        cliente_id: '1',
-        advogado_id: '1'
-    },
-    {
-        id: '2',
-        numero: '67890',
-        descricao: 'Divórcio consensual.',
-        data_abertura: '2024-03-22',
-        status: 'Em Andamento',
-        cliente_id: '2',
-        advogado_id: '2'
-    }
-];
-
-const advogados = [
-    {
-        id: '1',
-        nome: 'Dr. João Silva',
-        oab: '123456',
-        telefone: '11987654321',
-        email: 'joao.silva@advogado.com'
-    },
-    {
-        id: '2',
-        nome: 'Dra. Maria Oliveira',
-        oab: '654321',
-        telefone: '11912345678',
-        email: 'maria.oliveira@advogado.com'
-    }
-];
-
-const clientes = [
-    {
-        id: '1',
-        nome: 'Carlos Pereira',
-        cpf: '12345678900',
-        telefone: '11911112222',
-        email: 'carlos.pereira@cliente.com'
-    },
-    {
-        id: '2',
-        nome: 'Ana Souza',
-        cpf: '09876543211',
-        telefone: '11933334444',
-        email: 'ana.souza@cliente.com'
-    }
-];
-
-const audiencias = [
-    {
-        id: '1',
-        data: '2024-02-20',
-        hora: '09:00',
-        local: 'Tribunal Central',
-        processo_id: '1'
-    },
-    {
-        id: '2',
-        data: '2024-04-10',
-        hora: '14:00',
-        local: 'Sala 3B',
-        processo_id: '2'
-    }
-];
 
 
 // Rotas Processos
@@ -104,7 +103,7 @@ const audiencias = [
  *             schema:
  *               $ref: '#/components/schemas/Processo'
  */
-app.post('/processos', (req, res) => {
+app.post('/processos', verifyToken, (req, res) => {
     const { numero, descricao, data_abertura, status, cliente_id, advogado_id } = req.body;
     const id = uuidv4();
     const novoProcesso = { id, numero, descricao, data_abertura, status, cliente_id, advogado_id };

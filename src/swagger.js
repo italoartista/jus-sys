@@ -1,3 +1,4 @@
+// src/swagger.js
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
@@ -13,12 +14,26 @@ const swaggerDefinition = {
             url: 'http://localhost:3000',
             description: 'Servidor local'
         }
+    ],
+    components: {
+        securitySchemes: {
+            bearerAuth: {
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JW   T'
+            }
+        }
+    },
+    security: [
+        {
+            bearerAuth: []
+        }
     ]
 };
 
 const options = {
     swaggerDefinition,
-    apis: ['./index.js']
+    apis: ['./src/index.js']
 };
 
 const swaggerSpec = swaggerJSDoc(options);

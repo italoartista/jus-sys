@@ -1,138 +1,385 @@
 # Documento de Requisitos do Sistema Jurídico
 
-## Índice
-1. [Visão Geral](#visão-geral)
-2. [Modelos de Dados](#modelos-de-dados)
-3. [CRUD das Operações Básicas](#crud-das-operações-básicas)
-4. [Rotas/Endpoints](#rotasendpoints)
-5. [Regras de Negócio](#regras-de-negócio)
+## 1. Visão Geral
 
----
+O sistema jurídico é uma plataforma para gerenciar processos jurídicos, advogados, clientes e audiências. O sistema oferece funcionalidades CRUD (Criar, Ler, Atualizar, Excluir) para cada uma dessas entidades, além de autenticação via JSON Web Token (JWT).
 
-## Visão Geral
+## 2. Requisitos Funcionais
 
-O sistema jurídico visa gerenciar processos legais, advogados, clientes e audiências. As funcionalidades principais incluem a criação, leitura, atualização e exclusão de processos, advogados, clientes e audiências. 
+### 2.1 Autenticação
 
----
+- **Endpoint para Login**
+  - **Método**: POST
+  - **URL**: `/login`
+  - **Descrição**: Autentica o usuário e retorna um token JWT para acesso às APIs protegidas.
+  - **Corpo da Requisição**:
+    ```json
+    {
+      "username": "string",
+      "password": "string"
+    }
+    ```
+  - **Resposta**:
+    ```json
+    {
+      "token": "string"
+    }
+    ```
 
-## Modelos de Dados
+### 2.2 Processos
 
-### Processo
-- `id`: Identificador único do processo (UUID)
-- `numero`: Número do processo (string)
-- `descricao`: Descrição do processo (texto)
-- `data_abertura`: Data de abertura (data)
-- `status`: Status do processo (enum: 'Aberto', 'Em Andamento', 'Encerrado')
-- `cliente_id`: Referência ao cliente (UUID)
-- `advogado_id`: Referência ao advogado responsável (UUID)
+- **Criar Processo**
+  - **Método**: POST
+  - **URL**: `/processos`
+  - **Descrição**: Cria um novo processo.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Corpo da Requisição**:
+    ```json
+    {
+      "numero": "string",
+      "descricao": "string",
+      "data_abertura": "string",
+      "status": "string",
+      "cliente_id": "string",
+      "advogado_id": "string"
+    }
+    ```
+  - **Resposta**:
+    ```json
+    {
+      "id": "string",
+      "numero": "string",
+      "descricao": "string",
+      "data_abertura": "string",
+      "status": "string",
+      "cliente_id": "string",
+      "advogado_id": "string"
+    }
+    ```
 
-### Advogado
-- `id`: Identificador único do advogado (UUID)
-- `nome`: Nome do advogado (string)
-- `oab`: Número da OAB (string)
-- `telefone`: Telefone de contato (string)
-- `email`: E-mail (string)
+- **Consultar Processo**
+  - **Método**: GET
+  - **URL**: `/processos/{id}`
+  - **Descrição**: Retorna um processo pelo ID.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Resposta**:
+    ```json
+    {
+      "id": "string",
+      "numero": "string",
+      "descricao": "string",
+      "data_abertura": "string",
+      "status": "string",
+      "cliente_id": "string",
+      "advogado_id": "string"
+    }
+    ```
 
-### Cliente
-- `id`: Identificador único do cliente (UUID)
-- `nome`: Nome do cliente (string)
-- `cpf`: CPF do cliente (string)
-- `telefone`: Telefone de contato (string)
-- `email`: E-mail (string)
+- **Atualizar Processo**
+  - **Método**: PUT
+  - **URL**: `/processos/{id}`
+  - **Descrição**: Atualiza um processo existente.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Corpo da Requisição**:
+    ```json
+    {
+      "numero": "string",
+      "descricao": "string",
+      "data_abertura": "string",
+      "status": "string",
+      "cliente_id": "string",
+      "advogado_id": "string"
+    }
+    ```
+  - **Resposta**:
+    ```json
+    {
+      "id": "string",
+      "numero": "string",
+      "descricao": "string",
+      "data_abertura": "string",
+      "status": "string",
+      "cliente_id": "string",
+      "advogado_id": "string"
+    }
+    ```
 
-### Audiência
-- `id`: Identificador único da audiência (UUID)
-- `data`: Data da audiência (data)
-- `hora`: Hora da audiência (hora)
-- `local`: Local da audiência (string)
-- `processo_id`: Referência ao processo associado (UUID)
+- **Excluir Processo**
+  - **Método**: DELETE
+  - **URL**: `/processos/{id}`
+  - **Descrição**: Exclui um processo pelo ID.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Resposta**:
+    ```json
+    {
+      "message": "Processo excluído com sucesso"
+    }
+    ```
 
----
+### 2.3 Advogados
 
-## CRUD das Operações Básicas
+- **Criar Advogado**
+  - **Método**: POST
+  - **URL**: `/advogados`
+  - **Descrição**: Cria um novo advogado.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Corpo da Requisição**:
+    ```json
+    {
+      "nome": "string",
+      "oab": "string",
+      "telefone": "string",
+      "email": "string"
+    }
+    ```
+  - **Resposta**:
+    ```json
+    {
+      "id": "string",
+      "nome": "string",
+      "oab": "string",
+      "telefone": "string",
+      "email": "string"
+    }
+    ```
 
-### Processo
+- **Consultar Advogado**
+  - **Método**: GET
+  - **URL**: `/advogados/{id}`
+  - **Descrição**: Retorna um advogado pelo ID.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Resposta**:
+    ```json
+    {
+      "id": "string",
+      "nome": "string",
+      "oab": "string",
+      "telefone": "string",
+      "email": "string"
+    }
+    ```
 
-- **Create (POST)**: `/processos`
-  - **Payload**: `{"numero": "12345", "descricao": "Descrição do processo", "data_abertura": "2024-08-01", "status": "Aberto", "cliente_id": "UUID", "advogado_id": "UUID"}`
-  - **Resposta**: `{"id": "UUID", "numero": "12345", "descricao": "Descrição do processo", "data_abertura": "2024-08-01", "status": "Aberto", "cliente_id": "UUID", "advogado_id": "UUID"}`
+- **Atualizar Advogado**
+  - **Método**: PUT
+  - **URL**: `/advogados/{id}`
+  - **Descrição**: Atualiza um advogado existente.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Corpo da Requisição**:
+    ```json
+    {
+      "nome": "string",
+      "oab": "string",
+      "telefone": "string",
+      "email": "string"
+    }
+    ```
+  - **Resposta**:
+    ```json
+    {
+      "id": "string",
+      "nome": "string",
+      "oab": "string",
+      "telefone": "string",
+      "email": "string"
+    }
+    ```
 
-- **Read (GET)**: `/processos/{id}`
-  - **Resposta**: `{"id": "UUID", "numero": "12345", "descricao": "Descrição do processo", "data_abertura": "2024-08-01", "status": "Aberto", "cliente_id": "UUID", "advogado_id": "UUID"}`
+- **Excluir Advogado**
+  - **Método**: DELETE
+  - **URL**: `/advogados/{id}`
+  - **Descrição**: Exclui um advogado pelo ID.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Resposta**:
+    ```json
+    {
+      "message": "Advogado excluído com sucesso"
+    }
+    ```
 
-- **Update (PUT)**: `/processos/{id}`
-  - **Payload**: `{"numero": "12345", "descricao": "Descrição atualizada", "data_abertura": "2024-08-01", "status": "Em Andamento", "cliente_id": "UUID", "advogado_id": "UUID"}`
-  - **Resposta**: `{"id": "UUID", "numero": "12345", "descricao": "Descrição atualizada", "data_abertura": "2024-08-01", "status": "Em Andamento", "cliente_id": "UUID", "advogado_id": "UUID"}`
+### 2.4 Clientes
 
-- **Delete (DELETE)**: `/processos/{id}`
-  - **Resposta**: `{"message": "Processo excluído com sucesso"}`
+- **Criar Cliente**
+  - **Método**: POST
+  - **URL**: `/clientes`
+  - **Descrição**: Cria um novo cliente.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Corpo da Requisição**:
+    ```json
+    {
+      "nome": "string",
+      "cpf": "string",
+      "telefone": "string",
+      "email": "string"
+    }
+    ```
+  - **Resposta**:
+    ```json
+    {
+      "id": "string",
+      "nome": "string",
+      "cpf": "string",
+      "telefone": "string",
+      "email": "string"
+    }
+    ```
 
-### Advogado
+- **Consultar Cliente**
+  - **Método**: GET
+  - **URL**: `/clientes/{id}`
+  - **Descrição**: Retorna um cliente pelo ID.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Resposta**:
+    ```json
+    {
+      "id": "string",
+      "nome": "string",
+      "cpf": "string",
+      "telefone": "string",
+      "email": "string"
+    }
+    ```
 
-- **Create (POST)**: `/advogados`
-  - **Payload**: `{"nome": "Nome do Advogado", "oab": "123456", "telefone": "123456789", "email": "email@dominio.com"}`
-  - **Resposta**: `{"id": "UUID", "nome": "Nome do Advogado", "oab": "123456", "telefone": "123456789", "email": "email@dominio.com"}`
+- **Atualizar Cliente**
+  - **Método**: PUT
+  - **URL**: `/clientes/{id}`
+  - **Descrição**: Atualiza um cliente existente.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Corpo da Requisição**:
+    ```json
+    {
+      "nome": "string",
+      "cpf": "string",
+      "telefone": "string",
+      "email": "string"
+    }
+    ```
+  - **Resposta**:
+    ```json
+    {
+      "id": "string",
+      "nome": "string",
+      "cpf": "string",
+      "telefone": "string",
+      "email": "string"
+    }
+    ```
 
-- **Read (GET)**: `/advogados/{id}`
-  - **Resposta**: `{"id": "UUID", "nome": "Nome do Advogado", "oab": "123456", "telefone": "123456789", "email": "email@dominio.com"}`
+- **Excluir Cliente**
+  - **Método**: DELETE
+  - **URL**: `/clientes/{id}`
+  - **Descrição**: Exclui um cliente pelo ID.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Resposta**:
+    ```json
+    {
+      "message": "Cliente excluído com sucesso"
+    }
+    ```
 
-- **Update (PUT)**: `/advogados/{id}`
-  - **Payload**: `{"nome": "Nome Atualizado", "oab": "654321", "telefone": "987654321", "email": "novoemail@dominio.com"}`
-  - **Resposta**: `{"id": "UUID", "nome": "Nome Atualizado", "oab": "654321", "telefone": "987654321", "email": "novoemail@dominio.com"}`
+### 2.5 Audiências
 
-- **Delete (DELETE)**: `/advogados/{id}`
-  - **Resposta**: `{"message": "Advogado excluído com sucesso"}`
+- **Criar Audiência**
+  - **Método**: POST
+  - **URL**: `/audiencias`
+  - **Descrição**: Cria uma nova audiência.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Corpo da Requisição**:
+    ```json
+    {
+      "data": "string",
+      "hora": "string",
+      "local": "string",
+      "processo_id": "string"
+    }
+    ```
+  - **Resposta**:
+    ```json
+    {
+      "id": "string",
+      "data": "string",
+      "hora
 
-### Cliente
+": "string",
+      "local": "string",
+      "processo_id": "string"
+    }
+    ```
 
-- **Create (POST)**: `/clientes`
-  - **Payload**: `{"nome": "Nome do Cliente", "cpf": "12345678900", "telefone": "123456789", "email": "email@dominio.com"}`
-  - **Resposta**: `{"id": "UUID", "nome": "Nome do Cliente", "cpf": "12345678900", "telefone": "123456789", "email": "email@dominio.com"}`
+- **Consultar Audiência**
+  - **Método**: GET
+  - **URL**: `/audiencias/{id}`
+  - **Descrição**: Retorna uma audiência pelo ID.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Resposta**:
+    ```json
+    {
+      "id": "string",
+      "data": "string",
+      "hora": "string",
+      "local": "string",
+      "processo_id": "string"
+    }
+    ```
 
-- **Read (GET)**: `/clientes/{id}`
-  - **Resposta**: `{"id": "UUID", "nome": "Nome do Cliente", "cpf": "12345678900", "telefone": "123456789", "email": "email@dominio.com"}`
+- **Atualizar Audiência**
+  - **Método**: PUT
+  - **URL**: `/audiencias/{id}`
+  - **Descrição**: Atualiza uma audiência existente.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Corpo da Requisição**:
+    ```json
+    {
+      "data": "string",
+      "hora": "string",
+      "local": "string",
+      "processo_id": "string"
+    }
+    ```
+  - **Resposta**:
+    ```json
+    {
+      "id": "string",
+      "data": "string",
+      "hora": "string",
+      "local": "string",
+      "processo_id": "string"
+    }
+    ```
 
-- **Update (PUT)**: `/clientes/{id}`
-  - **Payload**: `{"nome": "Nome Atualizado", "cpf": "09876543210", "telefone": "987654321", "email": "novomail@dominio.com"}`
-  - **Resposta**: `{"id": "UUID", "nome": "Nome Atualizado", "cpf": "09876543210", "telefone": "987654321", "email": "novomail@dominio.com"}`
+- **Excluir Audiência**
+  - **Método**: DELETE
+  - **URL**: `/audiencias/{id}`
+  - **Descrição**: Exclui uma audiência pelo ID.
+  - **Cabeçalho**:
+    - `Authorization: Bearer <token>`
+  - **Resposta**:
+    ```json
+    {
+      "message": "Audiência excluída com sucesso"
+    }
+    ```
 
-- **Delete (DELETE)**: `/clientes/{id}`
-  - **Resposta**: `{"message": "Cliente excluído com sucesso"}`
+## 3. Regras de Negócio
 
-### Audiência
+1. **Autenticação e Autorização**
+   - Todos os endpoints que manipulam dados sensíveis requerem um token JWT válido no cabeçalho da requisição (`Authorization: Bearer <token>`).
+   - O token JWT é gerado através do endpoint `/login` e deve ser incluído em todas as requisições para endpoints protegidos.
 
-- **Create (POST)**: `/audiencias`
-  - **Payload**: `{"data": "2024-08-10", "hora": "14:00", "local": "Tribunal", "processo_id": "UUID"}`
-  - **Resposta**: `{"id": "UUID", "data": "2024-08-10", "hora": "14:00", "local": "Tribunal", "processo_id": "UUID"}`
+2. **Validação de Dados**
+   - Todos os dados recebidos e enviados pelas APIs devem ser validados para garantir integridade e consistência.
 
-- **Read (GET)**: `/audiencias/{id}`
-  - **Resposta**: `{"id": "UUID", "data": "2024-08-10", "hora": "14:00", "local": "Tribunal", "processo_id": "UUID"}`
-
-- **Update (PUT)**: `/audiencias/{id}`
-  - **Payload**: `{"data": "2024-08-15", "hora": "16:00", "local": "Sala 2", "processo_id": "UUID"}`
-  - **Resposta**: `{"id": "UUID", "data": "2024-08-15", "hora": "16:00", "local": "Sala 2", "processo_id": "UUID"}`
-
-- **Delete (DELETE)**: `/audiencias/{id}`
-  - **Resposta**: `{"message": "Audiência excluída com sucesso"}`
-
----
-
-## Regras de Negócio
-
-1. **Validação de Dados**
-   - CPF deve ser único para cada cliente.
-   - Número da OAB deve ser único para cada advogado.
-   - A data da audiência não pode ser anterior à data de abertura do processo.
-
-2. **Gerenciamento de Processos**
-   - O status do processo pode ser alterado apenas para "Em Andamento" ou "Encerrado" se o processo já estiver aberto.
-   - Um processo deve ter um cliente e um advogado associados.
-
-3. **Audiências**
-   - Não é permitido agendar múltiplas audiências para o mesmo processo na mesma data e hora.
-
-4. **Controle de Acesso**
-   - Apenas advogados podem ser associados a processos.
-   - Somente administradores podem excluir clientes, advogados ou processos.
-
----
